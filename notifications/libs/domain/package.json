@@ -1,0 +1,14 @@
+{
+  "name": "@UPT-FAING-EPIS/notifications_domain_contreras",
+  "version": "1.0.0",
+  "main": "dist/libs/domain/index.js",
+  "types": "dist/libs/domain/index.d.ts",
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UPT-FAING-EPIS/lab-2025-i-pds-u2-02-nest-AlvaroContreras13.git"
+  }
+}
