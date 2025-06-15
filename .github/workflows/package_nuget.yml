@@ -1,4 +1,4 @@
-name: SonarCloud Analysis and Publish customer-app_domain + notifications_domain
+name: Ejecutar pruebas unitarias
 
 on:
   push:
@@ -9,87 +9,37 @@ on:
       - main
 
 jobs:
-  sonarcloud-and-npm-publish:
-    name: SonarCloud + NPM Package
+  run-tests:
+    name: Pruebas unitarias - notifications y customer-app
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
-
     steps:
-      - name: 📥 Checkout code
+      - name: 📥 Checkout código
         uses: actions/checkout@v3
 
-      - name: 🟢 Setup Node.js
+      - name: 🟢 Configurar Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
-          registry-url: 'https://npm.pkg.github.com/'
-          scope: '@${{ github.repository_owner }}'
 
       # ========================
-      # 🔹 NOTIFICATIONS
+      # 🔹 Notificaciones
       # ========================
       - name: 📦 Instalar dependencias - notifications
         working-directory: notifications
         run: npm ci
 
-      - name: 🧪 Ejecutar pruebas unitarias - notifications
+      - name: 🧪 Ejecutar pruebas - notifications
         working-directory: notifications
         run: npm run test:cov
 
-      - name: ☁️ SonarCloud Scan - notifications
-        uses: SonarSource/sonarqube-scan-action@v2.0.2
-        with:
-          projectBaseDir: notifications
-          args: >
-            -Dsonar.projectKey=AlvaroContreras13_2lab2
-            -Dsonar.organization=alvarocontreras13
-            -Dsonar.sources=libs/domain/src
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
-
-      - name: 🔄 Versionar y publicar - notifications/libs/domain
-        working-directory: notifications/libs/domain
-        run: |
-          VERSION="1.0.$(date +%s)"
-          npm version "$VERSION" --no-git-tag-version
-          echo "📦 Notif. versión: $VERSION"
-          npm publish --access=public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       # ========================
-      # 🔹 CUSTOMER-APP
+      # 🔹 Customer App
       # ========================
       - name: 📦 Instalar dependencias - customer-app
         working-directory: customer-app
         run: npm ci
 
-      - name: 🧪 Ejecutar pruebas unitarias - customer-app
+      - name: 🧪 Ejecutar pruebas - customer-app
         working-directory: customer-app
         run: npm run test:cov
-
-      - name: ☁️ SonarCloud Scan - customer-app
-        uses: SonarSource/sonarqube-scan-action@v2.0.2
-        with:
-          projectBaseDir: customer-app
-          args: >
-            -Dsonar.projectKey=alvarocontreras13_2lab2
-            -Dsonar.organization=alvarocontreras13
-            -Dsonar.sources=libs/domain/src
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: https://sonarcloud.io
-
-      - name: 🔄 Versionar y publicar - customer-app/libs/domain
-        working-directory: customer-app/libs/domain
-        run: |
-          VERSION="1.0.$(date +%s)"
-          npm version "$VERSION" --no-git-tag-version
-          echo "📦 Customer versión: $VERSION"
-          npm publish --access=public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
