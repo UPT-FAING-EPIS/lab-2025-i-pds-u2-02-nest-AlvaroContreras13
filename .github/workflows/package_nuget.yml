@@ -111,7 +111,7 @@ jobs:
           echo "📦 Versión generada: $VERSION"
           cat package.json
 
-      - name: 🚀 Publicar en GitHub Packages
+      - name: 🚀 Publicar en GitHub Packages (npm, no nuget)
         working-directory: notifications/libs/domain
         run: npm publish --access=public
         env:
