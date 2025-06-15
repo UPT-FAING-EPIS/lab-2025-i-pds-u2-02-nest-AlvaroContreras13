@@ -1,0 +1,68 @@
+name: 🚀 Build and Publish Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: 📥 Checkout repositorio
+        uses: actions/checkout@v3
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: 'https://npm.pkg.github.com/'
+          scope: '@${{ github.repository_owner }}'
+
+      # ========================
+      # 🔹 Notifications
+      # ========================
+      - name: 📦 Instalar dependencias - notifications
+        working-directory: notifications
+        run: npm ci
+
+      - name: 🏗️ Construir paquete - notifications/libs/domain
+        working-directory: notifications/libs/domain
+        run: |
+          npm version patch --no-git-tag-version
+          npm pack
+          mv *.tgz ../../../notifications_domain.tgz
+
+      # ========================
+      # 🔹 Customer App
+      # ========================
+      - name: 📦 Instalar dependencias - customer-app
+        working-directory: customer-app
+        run: npm ci
+
+      - name: 🏗️ Construir paquete - customer-app/libs/domain
+        working-directory: customer-app/libs/domain
+        run: |
+          npm version patch --no-git-tag-version
+          npm pack
+          mv *.tgz ../../../customer_domain.tgz
+
+      # ========================
+      # 📦 Publicar Release
+      # ========================
+      - name: 🗃️ Crear GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: "Release v1.0.${{ github.run_number }}"
+          body: |
+            🔖 Versión automática publicada desde GitHub Actions.
+            - 📁 `notifications/libs/domain` → `notifications_domain.tgz`
+            - 📁 `customer-app/libs/domain` → `customer_domain.tgz`
+          files: |
+            notifications_domain.tgz
+            customer_domain.tgz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
