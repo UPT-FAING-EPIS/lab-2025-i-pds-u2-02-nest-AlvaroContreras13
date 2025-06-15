@@ -77,7 +77,7 @@ jobs:
         with:
           projectBaseDir: customer-app
           args: >
-            -Dsonar.projectKey=AlvaroContreras13_2lab2
+            -Dsonar.projectKey=alvarocontreras13_2lab2
             -Dsonar.organization=alvarocontreras13
             -Dsonar.sources=libs/domain/src
         env:
