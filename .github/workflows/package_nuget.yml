@@ -43,6 +43,10 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v2.0.2
         with:
           projectBaseDir: notifications
+          args: >
+            -Dsonar.projectKey=AlvaroContreras13_2lab2
+            -Dsonar.organization=alvarocontreras13
+            -Dsonar.sources=libs/domain/src
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
@@ -72,6 +76,10 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v2.0.2
         with:
           projectBaseDir: customer-app
+          args: >
+            -Dsonar.projectKey=AlvaroContreras13_2lab2
+            -Dsonar.organization=alvarocontreras13
+            -Dsonar.sources=libs/domain/src
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
