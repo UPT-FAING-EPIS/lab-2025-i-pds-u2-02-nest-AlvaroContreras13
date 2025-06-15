@@ -79,3 +79,40 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: https://sonarcloud.io
 
+  npm-publish:
+    name: Publicar paquete en GitHub Packages
+    runs-on: ubuntu-latest
+    needs: sonar-analysis
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: 📥 Checkout código
+        uses: actions/checkout@v3
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: 'https://npm.pkg.github.com/'
+          scope: '@${{ github.repository_owner }}'
+
+      - name: 📦 Instalar dependencias del paquete
+        working-directory: notifications
+        run: npm ci
+
+      - name: 🔄 Incrementar versión con timestamp único
+        working-directory: notifications/libs/domain
+        run: |
+          VERSION="1.0.$(date +%s)"
+          npm version "$VERSION" --no-git-tag-version
+          echo "📦 Versión generada: $VERSION"
+          cat package.json
+
+      - name: 🚀 Publicar en GitHub Packages
+        working-directory: notifications/libs/domain
+        run: npm publish --access=public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
