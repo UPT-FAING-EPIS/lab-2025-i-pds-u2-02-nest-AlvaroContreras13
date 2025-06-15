@@ -1,0 +1,55 @@
+name: Generar y Publicar Documentación en GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # --- Compodoc para notifications ---
+      - name: Instalar dependencias - notifications
+        working-directory: notifications
+        run: npm ci
+
+      - name: Generar documentación - notifications
+        working-directory: notifications
+        run: npx compodoc -p tsconfig.json -d documentation
+
+      # --- Compodoc para customer-app ---
+      - name: Instalar dependencias - customer-app
+        working-directory: customer-app
+        run: npm ci
+
+      - name: Generar documentación - customer-app
+        working-directory: customer-app
+        run: npx compodoc -p tsconfig.json -d documentation
+
+      # --- Copiar ambas documentaciones a una sola carpeta para publicar ---
+      - name: Preparar contenido para GitHub Pages
+        run: |
+          mkdir -p combined-docs/notifications
+          mkdir -p combined-docs/customer-app
+          cp -r notifications/documentation/* combined-docs/notifications
+          cp -r customer-app/documentation/* combined-docs/customer-app
+
+      # --- Publicar en GitHub Pages ---
+      - name: Deploy a GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./combined-docs
