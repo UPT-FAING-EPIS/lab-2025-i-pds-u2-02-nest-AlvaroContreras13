@@ -4,6 +4,9 @@ import { AbstractMessage } from './abstract-message';
 import { ShortMessage } from './short-message';
 import { SmsMessageSender } from './sms-message-sender';
 
+/**
+ * Prueba que verifica que los mensajes largos se envían correctamente por correo electrónico.
+ */
 describe('GivenLongMessage_WhenSend_ThenEmailIsTriggered', () => {
   let longMessage: AbstractMessage;
   let confirm: string;
@@ -13,39 +16,52 @@ describe('GivenLongMessage_WhenSend_ThenEmailIsTriggered', () => {
     longMessage = new LongMessage(new EmailMessageSender());
     confirm = longMessage.SendMessage(Message);
   });
-  it('Long Messsage should be not null', () => {
+
+  it('Long Message should be not null', () => {
     expect(confirm).not.toBeNull();
   });
-  it('Long Messsage should contains characters more than 0', () => {
+
+  it('Long Message should contain characters more than 0', () => {
     expect(confirm.length > 0).toBeTruthy();
   });
 });
 
+/**
+ * Prueba que verifica que los mensajes cortos se envían correctamente por SMS.
+ */
 describe('GivenShortMessage_WhenSend_ThenSMSIsTriggered', () => {
   let shortMessage: AbstractMessage;
   let confirm: string;
 
   beforeEach(async () => {
     const Message = "Este es un mensaje corto.";
-    shortMessage  = new ShortMessage(new SmsMessageSender());
-    confirm = shortMessage .SendMessage(Message);
+    shortMessage = new ShortMessage(new SmsMessageSender());
+    confirm = shortMessage.SendMessage(Message);
   });
-  it('Short Messsage should be not null', () => {
+
+  it('Short Message should be not null', () => {
     expect(confirm).not.toBeNull();
   });
-  it('Short Messsage should contains characters more than 0', () => {
+
+  it('Short Message should contain characters more than 0', () => {
     expect(confirm.length > 0).toBeTruthy();
   });
 });
 
+/**
+ * Prueba que verifica que un mensaje demasiado largo enviado por SMS lanza una excepción.
+ */
 describe('GivenLargeMessage_WhenSendinSMS_ThenOccursException', () => {
   let shortMessage: AbstractMessage;
   const Message = "Este es un mensaje largooooooooooooooooo.";
 
   beforeEach(async () => {
-    shortMessage  = new ShortMessage(new SmsMessageSender());
+    shortMessage = new ShortMessage(new SmsMessageSender());
   });
-  it('Large Messsage in SMS should be an error', () => {
-    expect(() => {shortMessage.SendMessage(Message)}).toThrow(new ShortMessage(new SmsMessageSender()).LARGE_ERROR_MESSAGE);
+
+  it('Large Message in SMS should throw an error', () => {
+    expect(() => {
+      shortMessage.SendMessage(Message);
+    }).toThrow(new ShortMessage(new SmsMessageSender()).LARGE_ERROR_MESSAGE);
   });
 });
